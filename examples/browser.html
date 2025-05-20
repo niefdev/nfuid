@@ -113,9 +113,9 @@
                     <div class="space-y-2">
                         <label for="timestampBits" class="block text-sm font-medium text-gray-300">Timestamp Bits</label>
                         <div class="flex items-center">
-                            <input type="range" id="timestampBits" min="1" max="64" value="42" 
+                            <input type="range" id="timestampBits" min="1" max="64" value="32" 
                                 class="w-full range-slider">
-                            <span id="timestampBitsValue" class="ml-3 w-10 text-right font-mono text-primary-400">42</span>
+                            <span id="timestampBitsValue" class="ml-3 w-10 text-right font-mono text-primary-400">32</span>
                         </div>
                         <p class="text-xs text-gray-500">Controls time precision and range (1-64)</p>
                     </div>
@@ -124,9 +124,9 @@
                     <div class="space-y-2">
                         <label for="entropyBits" class="block text-sm font-medium text-gray-300">Entropy Bits</label>
                         <div class="flex items-center">
-                            <input type="range" id="entropyBits" min="1" max="128" value="42" 
+                            <input type="range" id="entropyBits" min="1" max="128" value="96" 
                                 class="w-full range-slider">
-                            <span id="entropyBitsValue" class="ml-3 w-10 text-right font-mono text-primary-400">42</span>
+                            <span id="entropyBitsValue" class="ml-3 w-10 text-right font-mono text-primary-400">96</span>
                         </div>
                         <p class="text-xs text-gray-500">Controls uniqueness factor (1-128)</p>
                     </div>
@@ -181,7 +181,7 @@
                     <!-- ID Info -->
                     <div class="space-y-4">
                         <h3 class="text-lg font-medium text-gradient">ID Properties</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-2 md:grid-cols-2 gap-4"></div>
                             <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
                                 <p class="text-sm text-gray-400">Length</p>
                                 <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idLength">-</p>
@@ -191,20 +191,12 @@
                                 <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idTimestamp" title="-">-</p>
                             </div>
                             <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
-                                <p class="text-sm text-gray-400">Total Bits</p>
-                                <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idTotalBits">-</p>
-                            </div>
-                            <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
-                                <p class="text-sm text-gray-400">Entropy</p>
-                                <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idEntropy">-</p>
-                            </div>
-                            <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
-                                <p class="text-sm text-gray-400">Seed</p>
-                                <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idSeed" title="-">-</p>
-                            </div>
-                            <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
                                 <p class="text-sm text-gray-400">Random</p>
                                 <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idRandom" title="-">-</p>
+                            </div>
+                            <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
+                                <p class="text-sm text-gray-400">Binary</p>
+                                <p class="font-mono text-xs break-words whitespace-pre-line max-w-full text-primary-200" id="idBinary" title="-">-</p>
                             </div>
                         </div>
                     </div>
@@ -231,22 +223,18 @@
             const copyBtn = document.getElementById('copyBtn');
             const idLength = document.getElementById('idLength');
             const idTimestamp = document.getElementById('idTimestamp');
-            const idTotalBits = document.getElementById('idTotalBits');
-            const idEntropy = document.getElementById('idEntropy');
-            const idSeed = document.getElementById('idSeed');
             const idRandom = document.getElementById('idRandom');
+            const idBinary = document.getElementById('idBinary');
 
             document.getElementById('footer').innerHTML = `© ${new Date().getFullYear() > 2025 ? `2025-${new Date().getFullYear()}` : new Date().getFullYear()} niefdev • <a href="https://github.com/niefdev/nfuid" target="_blank" rel="noopener noreferrer">GitHub Repository</a> • MIT License`;
 
             // Update range values
             timestampBits.addEventListener('input', function() {
                 timestampBitsValue.textContent = this.value;
-                updateTotalBits();
             });
 
             entropyBits.addEventListener('input', function() {
                 entropyBitsValue.textContent = this.value;
-                updateTotalBits();
             });
 
             // Validate base characters
@@ -269,15 +257,7 @@
                 }
             });
 
-            // Update total bits calculation
-            function updateTotalBits() {
-                const seedBits = Math.min(parseInt(timestampBits.value), 64);
-                const total = parseInt(timestampBits.value) + seedBits + parseInt(entropyBits.value);
-                idTotalBits.textContent = total;
-            }
-            
             // Initialize
-            updateTotalBits();
             baseChars.dispatchEvent(new Event('input'));
 
             // Generate NFUID
@@ -299,31 +279,45 @@
                     idLength.textContent = id.length;
                     
                     const decoded = generator.decode(id);
-                    idTimestamp.textContent = decoded.date.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                    idTimestamp.title = decoded.date.toISOString();
-                    idEntropy.textContent = config.entropyLength + ' bits';
-                    idSeed.textContent = decoded.seed;
-                    idSeed.title = decoded.seed;
+
+                    if (decoded.formattedTimestamp) {
+                        idTimestamp.textContent = decoded.formattedTimestamp.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                        idTimestamp.title = decoded.formattedTimestamp.toISOString();
+                    } else {
+                        idTimestamp.textContent = '-';
+                        idTimestamp.title = '-';
+                    }
+
                     idRandom.textContent = decoded.random;
                     idRandom.title = decoded.random;
-                    
+
+                    // Show binary representation (as string of bits)
+                    if (decoded.binary) {
+                        idBinary.textContent = decoded.binary;
+                        idBinary.title = decoded.binary;
+                    } else if (decoded.bits) {
+                        idBinary.textContent = decoded.bits;
+                        idBinary.title = decoded.bits;
+                    } else {
+                        idBinary.textContent = '-';
+                        idBinary.title = '-';
+                    }
+
                     generatedId.classList.add('text-white');
                     setTimeout(() => generatedId.classList.remove('text-white'), 300);
                 } catch (error) {
                     generatedId.textContent = `Error: ${error.message}`;
                     idLength.textContent = '-';
                     idTimestamp.textContent = '-';
-                    idTotalBits.textContent = '-';
-                    idEntropy.textContent = '-';
-                    idSeed.textContent = '-';
                     idRandom.textContent = '-';
+                    idBinary.textContent = '-';
                 }
             });
 
@@ -335,7 +329,7 @@
                         const originalText = copyBtn.innerHTML;
                         copyBtn.innerHTML = `
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                             </svg>
                             Copied!
                         `;

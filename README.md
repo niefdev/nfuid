@@ -1,14 +1,14 @@
 # NFUID
 
-A simple JavaScript library for generating and decoding unique, URL-safe IDs using timestamps and random entropy. Born from a modest attempt to balance scalability and simplicity, NFUID is a small tool designed to be reliable and easy to use in both browser and Node.js environments.
+A compact JavaScript library for generating and decoding unique, URL-safe IDs using timestamps and random entropy. NFUID v1.2 introduces a new bit structure with a static leading flag, header obfuscation, and improved decoding logic. It works in both browser and Node.js environments.
 
 ## Features
 
-- Generates compact IDs with timestamp, seed, and random components
+- Generates short, unique IDs with timestamp and random entropy
 - Customizable base alphabet (default: alphanumeric, no ambiguous characters)
 - Configurable timestamp and entropy lengths
-- Decodes IDs to extract timestamp, seed, and date
-- Browser-compatible with no dependencies
+- Decodes IDs to extract timestamp, entropy, and bit structure
+- Browser-compatible, no dependencies
 
 ## Installation
 
@@ -19,7 +19,7 @@ npm install nfuid
 ```
 
 ```javascript
-const { NFUID } = require('nfuid');
+const NFUID = require('nfuid');
 ```
 
 ### Manual Inclusion
@@ -37,8 +37,8 @@ Copy `src/nfuid.js` into your project or include `dist/nfuid.min.js` in your HTM
 ```javascript
 const idGen = new NFUID({
     baseAlphabet: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
-    timestampLength: 32,
-    entropyLength: 96
+    timestampLength: 32, // bits for timestamp (0-63)
+    entropyLength: 96    // bits for random entropy (>= timestampLength + 6)
 });
 ```
 
@@ -54,7 +54,14 @@ console.log("ID:", id);
 ```javascript
 const decoded = idGen.decode(id);
 console.log("Decoded:", decoded);
-// { timestamp: 1736967023, seed: "a1b2c3d4", random: "e5f6a7b8", date: Date }
+// {
+//   timestampLength: 32,
+//   timestamp: 1736967023,
+//   randomLength: 96,
+//   random: "e5f6a7b8...",
+//   formattedTimestamp: Date,
+//   binary: "..." // binary representation
+// }
 ```
 
 ### Browser Example
@@ -65,34 +72,35 @@ See `examples/browser.html` for a working demo.
 
 ### Architecture
 
-NFUID creates IDs by combining:
+NFUID v1.2 IDs are structured as follows:
 
-- **Timestamp**: Unix time (seconds), masked to timestampLength bits, XORed with a seed for obfuscation.
-- **Seed**: Random bits (up to 64 bits) for added uniqueness.
-- **Random Entropy**: Additional random bits (entropyLength) for collision resistance.
-- **Base Encoding**: Converts the combined value to a string using a custom alphabet.
+- **Static Flag**: 1 bit, always set to 1 (for easy parsing)
+- **Header**: 6 bits, obfuscated with random bits, encodes timestamp length
+- **Timestamp**: Configurable bits (0-63), XOR-masked with random bits
+- **Random Entropy**: Configurable bits (>= timestampLength + 6), provides uniqueness and obfuscation
+- **Base Encoding**: All bits are encoded using the custom alphabet
 
 The library uses BigInt for large numbers and crypto.getRandomValues for secure random bits.
 
 ### Bit Structure
 
-- Total bits: timestampLength (XOR) + min(timestampLength, 64) (seed) + entropyLength
-- Format: [XOR(timestamp, seed) | seed | random]
+- Total bits: 1 (flag) + 6 (header) + timestampLength + entropyLength
+- Format: [1 | header (XOR) | timestamp (XOR) | random]
 - Encoded to base alphabet (default: 57 characters, ~5.83 bits/char)
 
-Example: 160 bits (32 timestamp + 32 seed + 96 entropy) yields ~28 characters.
+Example: 1 + 6 + 32 + 96 = 135 bits → ~24 characters.
 
 ### Key Methods
 
 - `constructor({ baseAlphabet, timestampLength, entropyLength })`: Initializes with validated config.
-- `generate()`: Combines timestamp, seed, and entropy, then encodes to a string.
-- `decode(id)`: Extracts timestamp, seed, random bits, and date from an ID.
-- Private methods: #toBase, #fromBase (base conversion), #generateRandomBits (random number generation).
+- `generate()`: Combines flag, header, timestamp, and entropy, then encodes to a string.
+- `decode(id)`: Extracts timestamp length, timestamp, random bits, and date from an ID.
+- Private methods: `#toBase`, `#fromBase` (base conversion), `#generateRandomBits` (random number generation).
 
 ### Security Notes
 
 - Uses crypto.getRandomValues for secure randomness.
-- Not suitable for cryptographic purposes (e.g., secrets).
+- Not suitable for cryptographic secrets.
 
 ## Notes
 
@@ -102,7 +110,7 @@ Example: 160 bits (32 timestamp + 32 seed + 96 entropy) yields ~28 characters.
 
 ## Contributing
 
-This is a simple project, but feedback or improvements are welcome! Submit issues or pull requests to the repository.
+Feedback and improvements are welcome! Submit issues or pull requests to the repository.
 
 ## License
 
@@ -111,3 +119,4 @@ This is a simple project, but feedback or improvements are welcome! Submit issue
 ## Author
 
 Created by [@niefdev](https://github.com/niefdev)
+
