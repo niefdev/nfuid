@@ -1,12 +1,12 @@
 # NFUID
 
-A compact JavaScript library for generating and decoding unique, URL-safe IDs using timestamps and random entropy. NFUID v1.2 introduces a new bit structure with a static leading flag, header obfuscation, and improved decoding logic. It works in both browser and Node.js environments.
+A compact JavaScript library for generating and decoding unique, URL-safe IDs using timestamps and random entropy. **NFUID v1.2.3** introduces improved header obfuscation, stricter validation, and more flexible bit configuration. It works in both browser and Node.js environments.
 
 ## Features
 
 - Generates short, unique IDs with timestamp and random entropy
 - Customizable base alphabet (default: alphanumeric, no ambiguous characters)
-- Configurable timestamp and entropy lengths
+- Configurable timestamp and entropy lengths (now defaults: 43 bits timestamp, 78 bits entropy)
 - Decodes IDs to extract timestamp, entropy, and bit structure
 - Browser-compatible, no dependencies
 
@@ -37,8 +37,8 @@ Copy `src/nfuid.js` into your project or include `dist/nfuid.min.js` in your HTM
 ```javascript
 const idGen = new NFUID({
     baseAlphabet: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
-    timestampLength: 32, // bits for timestamp (0-63)
-    entropyLength: 96    // bits for random entropy (>= timestampLength + 6)
+    timestampLength: 43, // bits for timestamp (0-63)
+    entropyLength: 78    // bits for random entropy (>= timestampLength + 6)
 });
 ```
 
@@ -55,9 +55,9 @@ console.log("ID:", id);
 const decoded = idGen.decode(id);
 console.log("Decoded:", decoded);
 // {
-//   timestampLength: 32,
-//   timestamp: 1736967023,
-//   randomLength: 96,
+//   timestampLength: 43,
+//   timestamp: 1736967023123,
+//   randomLength: 78,
 //   random: "e5f6a7b8...",
 //   formattedTimestamp: Date,
 //   binary: "..." // binary representation
@@ -72,7 +72,7 @@ See `examples/browser.html` for a working demo.
 
 ### Architecture
 
-NFUID v1.2 IDs are structured as follows:
+NFUID v1.2.3 IDs are structured as follows:
 
 - **Static Flag**: 1 bit, always set to 1 (for easy parsing)
 - **Header**: 6 bits, obfuscated with random bits, encodes timestamp length
@@ -88,7 +88,7 @@ The library uses BigInt for large numbers and crypto.getRandomValues for secure 
 - Format: [1 | header (XOR) | timestamp (XOR) | random]
 - Encoded to base alphabet (default: 57 characters, ~5.83 bits/char)
 
-Example: 1 + 6 + 32 + 96 = 135 bits → ~24 characters.
+Example: 1 + 6 + 43 + 78 = 128 bits → ~22 characters.
 
 ### Key Methods
 
