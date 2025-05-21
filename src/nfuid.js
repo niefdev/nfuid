@@ -7,25 +7,27 @@ class NFUID {
 
   constructor({
     baseAlphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
-    timestampLength = 32,
-    entropyLength = 96,
+    timestampLength = 43,
+    entropyLength = 78,
   } = {}) {
-    // Validate inputs
+    // Validate the base alphabet: must be ASCII and cannot include whitespace
     if (!/^[\x21-\x7E]+$/.test(baseAlphabet) || baseAlphabet.includes(" ")) {
       throw new Error(
         "Base alphabet must contain only valid ASCII characters without whitespace"
       );
     }
 
+    // Ensure all characters in the alphabet are unique
     if (new Set(baseAlphabet.split("")).size !== baseAlphabet.length) {
       throw new Error("Base alphabet must not contain duplicate characters");
     }
 
-    // Validate timestamp length
+    // Timestamp length must be within a valid range
     if (timestampLength < 0 || timestampLength > 63) {
       throw new Error("Timestamp length must be between 0 and 63 bits");
     }
 
+    // Ensure there's enough space for timestamp + header (6 bits)
     if (entropyLength < 6 + timestampLength) {
       throw new Error(
         `Entropy length must be at least ${6 + timestampLength} bits (timestamp + 6 bits)`
@@ -37,13 +39,14 @@ class NFUID {
     this.#timestampBits = timestampLength;
     this.#randomBits = entropyLength;
 
-    // Initialize base mapping
+    // Create a lookup map for character-to-index conversions
     this.#BASE_MAP = {};
     for (let i = 0; i < this.#BASE_ALPHABET.length; i++) {
       this.#BASE_MAP[this.#BASE_ALPHABET[i]] = BigInt(i);
     }
   }
 
+  // Converts a BigInt to a string using the custom base alphabet
   #toBase(num, minLength = 0) {
     if (num === 0n) {
       return this.#BASE_ALPHABET[0].repeat(minLength || 1);
@@ -58,7 +61,7 @@ class NFUID {
       result = this.#BASE_ALPHABET[Number(rem)] + result;
     }
 
-    // Tambahkan padding '0' di depan agar panjang string tetap minLength
+    // Pad the result to match the minimum required length
     while (result.length < minLength) {
       result = this.#BASE_ALPHABET[0] + result;
     }
@@ -66,8 +69,7 @@ class NFUID {
     return result;
   }
 
-  // Decode base string ke BigInt
-  // *tidak* ada parameter minLength, dan tidak menghilangkan nol depan di angka
+  // Converts a base-encoded string back into a BigInt
   #fromBase(str) {
     let result = 0n;
     for (const char of str) {
@@ -80,6 +82,7 @@ class NFUID {
     return result;
   }
 
+  // Generates a random BigInt of the specified bit length
   #generateRandomBits(bits) {
     const bytes = Math.ceil(bits / 8);
     const buffer = new Uint8Array(bytes);
@@ -92,95 +95,77 @@ class NFUID {
   }
 
   generate() {
-    // Create header (6 bits containing timestamp length)
     const headerBits = 6;
     const header = BigInt(this.#timestampBits);
 
-    // Get current timestamp (Unix epoch in seconds)
+    // Use current time (in ms), masked to the allowed timestamp bit length
     const timestampMask = (1n << BigInt(this.#timestampBits)) - 1n;
     const timestamp =
       this.#timestampBits > 0
-        ? BigInt(Math.floor(Date.now() / 1000)) & timestampMask
+        ? BigInt(Date.now()) & timestampMask
         : 0n;
 
-    // Generate random bits
     const randBits = this.#generateRandomBits(this.#randomBits);
 
     let finalHeader = header;
     let finalTimestamp = timestamp;
 
-    // Ambil 6 bit terakhir untuk header XOR mask
-    const headerXorMask =
-      randBits & ((1n << BigInt(headerBits)) - 1n); // ambil 6 bit terakhir
+    // Use the last 6 bits of the random value to obfuscate the header
+    const headerXorMask = randBits & ((1n << BigInt(headerBits)) - 1n);
     finalHeader = header ^ headerXorMask;
   
-    // Ambil N bit pertama dari randBits (paling kiri) untuk timestamp XOR mask
     if (this.#timestampBits > 0) {
+      // Use the highest bits of the random value to obfuscate the timestamp
       const timestampXorMask =
         randBits >> BigInt(this.#randomBits - this.#timestampBits);
       finalTimestamp = timestamp ^ timestampXorMask;
     }
-    
 
-    // Combine all parts: hidden flag + header + timestamp + random
-    // Add a static 1 bit at the most significant position
-    let finalValue = 1n;
+    // Combine all parts into a single BigInt:
+    // 1 (flag) + 6-bit header + timestamp + random
+    let finalValue = 1n; // leading flag bit
 
-    // Add header bits (6 bits)
     finalValue = (finalValue << BigInt(headerBits)) | finalHeader;
 
-    // Add timestamp bits if any
     if (this.#timestampBits > 0) {
       finalValue = (finalValue << BigInt(this.#timestampBits)) | finalTimestamp;
     }
 
-    // Add random bits
     finalValue = (finalValue << BigInt(this.#randomBits)) | randBits;
 
-    // Calculate total bits and required length in the chosen base
+    // Estimate how many characters are needed to represent the value
     const totalBits = BigInt(
       1 + headerBits + this.#timestampBits + this.#randomBits
-    ); // 1 for hidden flag
+    );
     const bitsPerChar = Math.log2(this.#BASE_ALPHABET.length);
     const minLength = Math.ceil(Number(totalBits) / bitsPerChar);
 
-    // Convert to base
     return this.#toBase(finalValue, minLength);
   }
 
   decode(id) {
-    // Convert base string to BigInt
     const full = this.#fromBase(id);
-    const binary = full.toString(2).slice(1);
-    
-    // Get the total number of bits (minus the leading 1 flag)
+    const binary = full.toString(2).slice(1); // Remove leading 1-bit flag
+
     const fullLength = binary.length;
-    
-    // Remove the static leading 1 bit
-    const value = full ^ (1n << BigInt(fullLength));
-    
-    // Constants
+    const value = full ^ (1n << BigInt(fullLength)); // Clear the leading flag
+
     const headerBits = 6;
     const headerMask = (1n << BigInt(headerBits)) - 1n;
-    
-    // Extract header (6 bits, MSB after leading 1)
+
     const headerShift = BigInt(fullLength - headerBits);
     const encodedHeader = (value >> headerShift) & headerMask;
-    
-    // Extract XOR mask for header (last 6 bits of random)
+
+    // Extract the original XOR mask used to obfuscate the header
     const headerXorMask = value & headerMask;
-    
-    // Decode the actual timestampBits
+
+    // Reconstruct the actual timestamp bit length
     const actualTimestampBits = Number(encodedHeader ^ headerXorMask);
-    
-    // Calculate actual randomBitsLength
+
     const randomBitsLength = fullLength - headerBits - actualTimestampBits;
     const randomMask = (1n << BigInt(randomBitsLength)) - 1n;
-    
-    // Extract random bits
     const encodedRandom = value & randomMask;
-    
-    // Prepare result object
+
     const result = {
       timestampLength: actualTimestampBits,
       timestamp: 0,
@@ -189,23 +174,26 @@ class NFUID {
       formattedTimestamp: null,
       binary: binary
     };
-    
-    // Only process timestamp if it exists
+
     if (actualTimestampBits > 0) {
       const timestampShift = BigInt(randomBitsLength);
       const timestampMask = (1n << BigInt(actualTimestampBits)) - 1n;
       const encodedTimestamp = (value >> timestampShift) & timestampMask;
-      
-      // Get XOR mask from highest bits of random
+
+      // Recover the timestamp by reversing the XOR mask
       const timestampXorMask = encodedRandom >> BigInt(randomBitsLength - actualTimestampBits);
       const actualTimestamp = encodedTimestamp ^ timestampXorMask;
-      
+
       result.timestamp = Number(actualTimestamp);
-      result.formattedTimestamp = new Date(Number(actualTimestamp) * 1000);
+      result.formattedTimestamp = new Date(Number(actualTimestamp));
     }
-    
+
     return result;
   }
 }
 
-module.exports=NFUID;
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = NFUID;
+} else {
+  window.NFUID = NFUID;
+}

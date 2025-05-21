@@ -105,7 +105,7 @@ Example: 1 + 6 + 32 + 96 = 135 bits → ~24 characters.
 ## Notes
 
 - **Compatibility**: Works in modern browsers (Chrome 74+, Firefox 90+, Safari 14.1+) and Node.js, using BigInt and crypto.getRandomValues.
-- **Limitations**: Not for cryptographic use; timestamp resolution is in seconds.
+- **Limitations**: Not for cryptographic use.
 - **Size**: Single class, no dependencies, minified version ~1KB.
 
 ## Contributing

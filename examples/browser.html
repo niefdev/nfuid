@@ -1,360 +1,511 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NFUID Generator</title>
     <script src="../dist/nfuid.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#fff7ed',
-                            100: '#ffedd5',
-                            200: '#fed7aa',
-                            300: '#fdba74',
-                            400: '#fb923c',
-                            500: '#f97316',
-                            600: '#ea580c',
-                            700: '#c2410c',
-                            800: '#9a3412',
-                            900: '#7c2d12',
-                        },
-                        dark: {
-                            700: '#1a1a22',
-                            800: '#121218', 
-                            900: '#0a0a10',
-                        },
-                        accent: {
-                            400: '#fb923c',
-                            500: '#f97316',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    boxShadow: {
-                        'tech': '0 0 15px rgba(251, 146, 60, 0.15), 0 0 5px rgba(251, 146, 60, 0.3)',
-                        'tech-lg': '0 0 25px rgba(251, 146, 60, 0.2), 0 0 8px rgba(251, 146, 60, 0.4)',
-                        'tech-inner': 'inset 0 0 10px rgba(251, 146, 60, 0.1), inset 0 0 5px rgba(0, 0, 0, 0.5)',
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: "#fff7ed",
+                100: "#ffedd5",
+                200: "#fed7aa",
+                300: "#fdba74",
+                400: "#fb923c",
+                500: "#f97316",
+                600: "#ea580c",
+                700: "#c2410c",
+                800: "#9a3412",
+                900: "#7c2d12",
+              },
+              dark: {
+                700: "#1a1a22",
+                800: "#121218",
+                900: "#0a0a10",
+              },
+              accent: {
+                400: "#fb923c",
+                500: "#f97316",
+              },
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            boxShadow: {
+              tech: "0 0 15px rgba(251, 146, 60, 0.15), 0 0 5px rgba(251, 146, 60, 0.3)",
+              "tech-lg":
+                "0 0 25px rgba(251, 146, 60, 0.2), 0 0 8px rgba(251, 146, 60, 0.4)",
+              "tech-inner":
+                "inset 0 0 10px rgba(251, 146, 60, 0.1), inset 0 0 5px rgba(0, 0, 0, 0.5)",
+            },
+          },
+        },
+      };
     </script>
     <style type="text/tailwindcss">
-        @layer utilities {
-            .bg-glass {
-                background: rgba(10, 10, 16, 0.75);
-                backdrop-filter: blur(15px);
-                border: 1px solid rgba(251, 146, 60, 0.2);
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            }
-            .text-gradient {
-                @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-500;
-            }
-            .tech-border {
-                border: 1px solid transparent;
-                border-image: linear-gradient(90deg, #fb923c 0%, #f97316 100%);
-                border-image-slice: 1;
-            }
-            .tech-glow {
-                box-shadow: 0 0 16px 2px rgba(251, 146, 60, 0.3);
-            }
-            .tech-bg {
-                background: radial-gradient(circle at center, rgba(251, 146, 60, 0.08) 0%, rgba(8, 8, 12, 0) 70%);
-            }
-            .range-slider {
-                @apply appearance-none h-2 rounded-full bg-dark-700 cursor-pointer;
-            }
-            .range-slider::-webkit-slider-thumb {
-                @apply appearance-none w-4 h-4 rounded-full bg-primary-500 cursor-pointer hover:bg-primary-400 shadow-tech;
-            }
-            .range-slider::-moz-range-thumb {
-                @apply appearance-none w-4 h-4 rounded-full bg-primary-500 cursor-pointer hover:bg-primary-400 shadow-tech border-0;
-            }
-            .animate-glow {
-                animation: glow 2s ease-in-out infinite alternate;
-            }
-            @keyframes glow {
-                from {
-                    box-shadow: 0 0 5px rgba(251, 146, 60, 0.3);
-                }
-                to {
-                    box-shadow: 0 0 15px rgba(251, 146, 60, 0.5);
-                }
-            }
+      @layer utilities {
+        .bg-glass {
+          background: rgba(10, 10, 16, 0.75);
+          backdrop-filter: blur(15px);
+          border: 1px solid rgba(251, 146, 60, 0.2);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
+        .text-gradient {
+          @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-500;
+        }
+        .tech-border {
+          border: 1px solid transparent;
+          border-image: linear-gradient(90deg, #fb923c 0%, #f97316 100%);
+          border-image-slice: 1;
+        }
+        .tech-glow {
+          box-shadow: 0 0 16px 2px rgba(251, 146, 60, 0.3);
+        }
+        .tech-bg {
+          background: radial-gradient(
+            circle at center,
+            rgba(251, 146, 60, 0.08) 0%,
+            rgba(8, 8, 12, 0) 70%
+          );
+        }
+        .range-slider {
+          @apply appearance-none h-2 rounded-full bg-dark-700 cursor-pointer;
+        }
+        .range-slider::-webkit-slider-thumb {
+          @apply appearance-none w-4 h-4 rounded-full bg-primary-500 cursor-pointer hover:bg-primary-400 shadow-tech;
+        }
+        .range-slider::-moz-range-thumb {
+          @apply appearance-none w-4 h-4 rounded-full bg-primary-500 cursor-pointer hover:bg-primary-400 shadow-tech border-0;
+        }
+        .animate-glow {
+          animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+          from {
+            box-shadow: 0 0 5px rgba(251, 146, 60, 0.3);
+          }
+          to {
+            box-shadow: 0 0 15px rgba(251, 146, 60, 0.5);
+          }
+        }
+      }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-</head>
-<body class="bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 text-gray-200 min-h-screen flex items-center justify-center dark">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 text-gray-200 min-h-screen flex items-center justify-center dark"
+  >
     <div class="fixed inset-0 tech-bg pointer-events-none opacity-70"></div>
-    <div class="container mx-auto px-4 py-12 max-w-5xl flex flex-col justify-center min-h-screen relative z-10">
-        <main class="bg-glass rounded-2xl p-6 md:p-8 mb-10 shadow-tech-lg border border-dark-700 border-opacity-80">
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Configuration Panel -->
-                <div class="space-y-6">
-                    <h2 class="text-2xl font-semibold text-white mb-4 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-gradient">Configuration</span>
-                    </h2>
-                    
-                    <!-- Timestamp Bits Configuration -->
-                    <div class="space-y-2">
-                        <label for="timestampBits" class="block text-sm font-medium text-gray-300">Timestamp Bits</label>
-                        <div class="flex items-center">
-                            <input type="range" id="timestampBits" min="1" max="64" value="32" 
-                                class="w-full range-slider">
-                            <span id="timestampBitsValue" class="ml-3 w-10 text-right font-mono text-primary-400">32</span>
-                        </div>
-                        <p class="text-xs text-gray-500">Controls time precision and range (1-64)</p>
-                    </div>
+    <div
+      class="container mx-auto px-4 py-12 max-w-5xl flex flex-col justify-center min-h-screen relative z-10"
+    >
+      <main
+        class="bg-glass rounded-2xl p-4 sm:p-6 md:p-8 mb-10 shadow-tech-lg border border-dark-700 border-opacity-80"
+      >
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- Configuration Panel -->
+          <div class="space-y-6">
+            <h2
+              class="text-2xl font-semibold text-white mb-4 flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 mr-2 text-primary-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <span class="text-gradient">Configuration</span>
+            </h2>
 
-                    <!-- Entropy Bits Configuration -->
-                    <div class="space-y-2">
-                        <label for="entropyBits" class="block text-sm font-medium text-gray-300">Entropy Bits</label>
-                        <div class="flex items-center">
-                            <input type="range" id="entropyBits" min="1" max="128" value="96" 
-                                class="w-full range-slider">
-                            <span id="entropyBitsValue" class="ml-3 w-10 text-right font-mono text-primary-400">96</span>
-                        </div>
-                        <p class="text-xs text-gray-500">Controls uniqueness factor (1-128)</p>
-                    </div>
-
-                    <!-- Base ASCII Configuration -->
-                    <div class="space-y-2">
-                        <label for="baseChars" class="block text-sm font-medium text-gray-300">Base ASCII Characters</label>
-                        <input type="text" id="baseChars" value="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" 
-                            class="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm">
-                        <div class="flex justify-between text-xs">
-                            <p id="baseCharWarning" class="text-primary-400 hidden">Must be ASCII, no whitespace or duplicates</p>
-                            <p id="charCount" class="text-gray-500">58 characters</p>
-                        </div>
-                    </div>
-
-                    <!-- Generate Button -->
-                    <button id="generateBtn" 
-                        class="w-full py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-medium rounded-lg shadow-tech transition-all duration-300 flex justify-center items-center hover:shadow-tech-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd" />
-                        </svg>
-                        Generate NFUID
-                    </button>
-                </div>
-
-                <!-- Results Panel -->
-                <div class="space-y-6">
-                    <h2 class="text-2xl font-semibold text-white mb-4 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                        </svg>
-                        <span class="text-gradient">Generated ID</span>
-                    </h2>
-
-                    <!-- Generated ID Display -->
-                    <div class="bg-dark-900 border border-dark-700 rounded-lg p-4 overflow-x-auto shadow-tech-inner">
-                        <div class="font-mono text-lg text-primary-300 break-all min-w-0" id="generatedId" style="word-break: break-all;">
-                            <div class="animate-pulse bg-dark-800 h-6 rounded"></div>
-                        </div>
-                        <div class="flex justify-between mt-4">
-                            <span class="text-xs text-gray-500">Click ID to copy</span>
-                            <button id="copyBtn" class="text-xs text-primary-400 hover:text-primary-300 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                                </svg>
-                                Copy
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- ID Info -->
-                    <div class="space-y-4">
-                        <h3 class="text-lg font-medium text-gradient">ID Properties</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-2 gap-4"></div>
-                            <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
-                                <p class="text-sm text-gray-400">Length</p>
-                                <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idLength">-</p>
-                            </div>
-                            <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
-                                <p class="text-sm text-gray-400">Timestamp</p>
-                                <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idTimestamp" title="-">-</p>
-                            </div>
-                            <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
-                                <p class="text-sm text-gray-400">Random</p>
-                                <p class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200" id="idRandom" title="-">-</p>
-                            </div>
-                            <div class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200">
-                                <p class="text-sm text-gray-400">Binary</p>
-                                <p class="font-mono text-xs break-words whitespace-pre-line max-w-full text-primary-200" id="idBinary" title="-">-</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Timestamp Bits Configuration -->
+            <div class="space-y-2">
+              <label
+                for="timestampBits"
+                class="block text-sm font-medium text-gray-300"
+                >Timestamp Bits</label
+              >
+              <div class="flex items-center">
+                <input
+                  type="range"
+                  id="timestampBits"
+                  min="1"
+                  max="64"
+                  value="43"
+                  class="w-full range-slider"
+                />
+                <span
+                  id="timestampBitsValue"
+                  class="ml-3 w-10 text-right font-mono text-primary-400"
+                  >43</span
+                >
+              </div>
+              <p class="text-xs sm:text-sm text-gray-500">
+                Controls time precision and range (1-64)
+              </p>
             </div>
-        </main>
-        <div class="text-center text-gray-500 text-xs" id="footer">
-            
+
+            <!-- Entropy Bits Configuration -->
+            <div class="space-y-2">
+              <label
+                for="entropyBits"
+                class="block text-sm font-medium text-gray-300"
+                >Entropy Bits</label
+              >
+              <div class="flex items-center">
+                <input
+                  type="range"
+                  id="entropyBits"
+                  min="1"
+                  max="128"
+                  value="78"
+                  class="w-full range-slider"
+                />
+                <span
+                  id="entropyBitsValue"
+                  class="ml-3 w-10 text-right font-mono text-primary-400"
+                  >78</span
+                >
+              </div>
+              <p class="text-xs sm:text-sm text-gray-500">
+                Controls uniqueness factor (1-128)
+              </p>
+            </div>
+
+            <!-- Base ASCII Configuration -->
+            <div class="space-y-2">
+              <label
+                for="baseChars"
+                class="block text-sm font-medium text-gray-300"
+                >Base ASCII Characters</label
+              >
+              <input
+                type="text"
+                id="baseChars"
+                value="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+                class="w-full min-w-0 px-3 py-2 bg-dark-900 border border-dark-700 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
+              />
+              <div class="flex justify-between text-xs sm:text-sm">
+                <p id="baseCharWarning" class="text-primary-400 hidden">
+                  Must be ASCII, no whitespace or duplicates
+                </p>
+                <p id="charCount" class="text-gray-500">58 characters</p>
+              </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button
+              id="generateBtn"
+              class="w-full py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-medium rounded-lg shadow-tech transition-all duration-300 flex justify-center items-center hover:shadow-tech-lg"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Generate NFUID
+            </button>
+          </div>
+
+          <!-- Results Panel -->
+          <div class="space-y-6">
+            <h2
+              class="text-2xl font-semibold text-white mb-4 flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 mr-2 text-primary-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"
+                />
+              </svg>
+              <span class="text-gradient">Generated ID</span>
+            </h2>
+
+            <!-- Generated ID Display -->
+            <div
+              class="bg-dark-900 border border-dark-700 rounded-lg p-4 overflow-x-auto shadow-tech-inner"
+            >
+              <div
+                class="font-mono text-lg text-primary-300 break-all min-w-0"
+                id="generatedId"
+                style="word-break: break-all"
+              >
+                <div class="animate-pulse bg-dark-800 h-6 rounded"></div>
+              </div>
+              <div class="flex justify-between mt-4">
+                <span class="text-xs sm:text-sm text-gray-500"
+                  >Click ID to copy</span
+                >
+                <button
+                  id="copyBtn"
+                  class="text-xs sm:text-sm text-primary-400 hover:text-primary-300 flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 mr-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    <path
+                      d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"
+                    />
+                  </svg>
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <!-- ID Info -->
+            <div class="space-y-4">
+              <h3 class="text-lg font-medium text-gradient">ID Properties</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
+                <div
+                  class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200"
+                >
+                  <p class="text-sm text-gray-400">Length</p>
+                  <p
+                    class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200"
+                    id="idLength"
+                  >
+                    -
+                  </p>
+                </div>
+                <div
+                  class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200"
+                >
+                  <p class="text-sm text-gray-400">Timestamp</p>
+                  <p
+                    class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200"
+                    id="idTimestamp"
+                    title="-"
+                  >
+                    -
+                  </p>
+                </div>
+                <div
+                  class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200"
+                >
+                  <p class="text-sm text-gray-400">Random</p>
+                  <p
+                    class="font-mono text-lg break-words whitespace-pre-line max-w-full text-primary-200"
+                    id="idRandom"
+                    title="-"
+                  >
+                    -
+                  </p>
+                </div>
+                <div
+                  class="bg-glass p-3 rounded-lg hover:shadow-tech transition-all duration-200"
+                >
+                  <p class="text-sm text-gray-400">Binary</p>
+                  <p
+                    class="font-mono text-xs sm:text-sm break-words whitespace-pre-line max-w-full text-primary-200"
+                    id="idBinary"
+                    title="-"
+                  >
+                    -
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </main>
+      <div
+        class="text-center text-xs sm:text-sm text-gray-500"
+        id="footer"
+      ></div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Elements
-            const timestampBits = document.getElementById('timestampBits');
-            const timestampBitsValue = document.getElementById('timestampBitsValue');
-            const entropyBits = document.getElementById('entropyBits');
-            const entropyBitsValue = document.getElementById('entropyBitsValue');
-            const baseChars = document.getElementById('baseChars');
-            const baseCharWarning = document.getElementById('baseCharWarning');
-            const charCount = document.getElementById('charCount');
-            const generateBtn = document.getElementById('generateBtn');
-            const generatedId = document.getElementById('generatedId');
-            const copyBtn = document.getElementById('copyBtn');
-            const idLength = document.getElementById('idLength');
-            const idTimestamp = document.getElementById('idTimestamp');
-            const idRandom = document.getElementById('idRandom');
-            const idBinary = document.getElementById('idBinary');
+      document.addEventListener("DOMContentLoaded", function () {
+        // Elements
+        const timestampBits = document.getElementById("timestampBits");
+        const timestampBitsValue =
+          document.getElementById("timestampBitsValue");
+        const entropyBits = document.getElementById("entropyBits");
+        const entropyBitsValue = document.getElementById("entropyBitsValue");
+        const baseChars = document.getElementById("baseChars");
+        const baseCharWarning = document.getElementById("baseCharWarning");
+        const charCount = document.getElementById("charCount");
+        const generateBtn = document.getElementById("generateBtn");
+        const generatedId = document.getElementById("generatedId");
+        const copyBtn = document.getElementById("copyBtn");
+        const idLength = document.getElementById("idLength");
+        const idTimestamp = document.getElementById("idTimestamp");
+        const idRandom = document.getElementById("idRandom");
+        const idBinary = document.getElementById("idBinary");
 
-            document.getElementById('footer').innerHTML = `© ${new Date().getFullYear() > 2025 ? `2025-${new Date().getFullYear()}` : new Date().getFullYear()} niefdev • <a href="https://github.com/niefdev/nfuid" target="_blank" rel="noopener noreferrer">GitHub Repository</a> • MIT License`;
+        document.getElementById("footer").innerHTML = `© ${
+          new Date().getFullYear() > 2025
+            ? `2025-${new Date().getFullYear()}`
+            : new Date().getFullYear()
+        } niefdev • <a href="https://github.com/niefdev/nfuid" target="_blank" rel="noopener noreferrer">GitHub Repository</a> • MIT License`;
 
-            // Update range values
-            timestampBits.addEventListener('input', function() {
-                timestampBitsValue.textContent = this.value;
-            });
+        // Update range values
+        timestampBits.addEventListener("input", function () {
+          timestampBitsValue.textContent = this.value;
+        });
 
-            entropyBits.addEventListener('input', function() {
-                entropyBitsValue.textContent = this.value;
-            });
+        entropyBits.addEventListener("input", function () {
+          entropyBitsValue.textContent = this.value;
+        });
 
-            // Validate base characters
-            baseChars.addEventListener('input', function() {
-                const value = this.value;
-                charCount.textContent = `${value.length} characters`;
-                
-                const hasWhitespace = /\s/.test(value);
-                const hasRepeatedChars = new Set(value).size !== value.length;
-                const hasNonAscii = !/^[\x21-\x7E]*$/.test(value);
-                
-                if (hasWhitespace || hasRepeatedChars || hasNonAscii) {
-                    baseCharWarning.classList.remove('hidden');
-                    charCount.classList.add('hidden');
-                    generateBtn.disabled = true;
-                } else {
-                    baseCharWarning.classList.add('hidden');
-                    charCount.classList.remove('hidden');
-                    generateBtn.disabled = false;
-                }
-            });
+        // Validate base characters
+        baseChars.addEventListener("input", function () {
+          const value = this.value;
+          charCount.textContent = `${value.length} characters`;
 
-            // Initialize
-            baseChars.dispatchEvent(new Event('input'));
+          const hasWhitespace = /\s/.test(value);
+          const hasRepeatedChars = new Set(value).size !== value.length;
+          const hasNonAscii = !/^[\x21-\x7E]*$/.test(value);
 
-            // Generate NFUID
-            generateBtn.addEventListener('click', function() {
-                try {
-                    if (typeof NFUID !== 'function') {
-                        throw new Error("NFUID library not loaded");
-                    }
+          if (hasWhitespace || hasRepeatedChars || hasNonAscii) {
+            baseCharWarning.classList.remove("hidden");
+            charCount.classList.add("hidden");
+            generateBtn.disabled = true;
+          } else {
+            baseCharWarning.classList.add("hidden");
+            charCount.classList.remove("hidden");
+            generateBtn.disabled = false;
+          }
+        });
 
-                    const config = {
-                        baseAlphabet: baseChars.value,
-                        timestampLength: parseInt(timestampBits.value),
-                        entropyLength: parseInt(entropyBits.value)
-                    };
-                    
-                    const generator = new NFUID(config);
-                    const id = generator.generate();
-                    generatedId.textContent = id;
-                    idLength.textContent = id.length;
-                    
-                    const decoded = generator.decode(id);
+        // Initialize
+        baseChars.dispatchEvent(new Event("input"));
 
-                    if (decoded.formattedTimestamp) {
-                        idTimestamp.textContent = decoded.formattedTimestamp.toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-                        idTimestamp.title = decoded.formattedTimestamp.toISOString();
-                    } else {
-                        idTimestamp.textContent = '-';
-                        idTimestamp.title = '-';
-                    }
+        // Generate NFUID
+        generateBtn.addEventListener("click", function () {
+          try {
+            if (typeof NFUID !== "function") {
+              throw new Error("NFUID library not loaded");
+            }
 
-                    idRandom.textContent = decoded.random;
-                    idRandom.title = decoded.random;
+            const config = {
+              baseAlphabet: baseChars.value,
+              timestampLength: parseInt(timestampBits.value),
+              entropyLength: parseInt(entropyBits.value),
+            };
 
-                    // Show binary representation (as string of bits)
-                    if (decoded.binary) {
-                        idBinary.textContent = decoded.binary;
-                        idBinary.title = decoded.binary;
-                    } else if (decoded.bits) {
-                        idBinary.textContent = decoded.bits;
-                        idBinary.title = decoded.bits;
-                    } else {
-                        idBinary.textContent = '-';
-                        idBinary.title = '-';
-                    }
+            const generator = new NFUID(config);
+            const id = generator.generate();
+            generatedId.textContent = id;
+            idLength.textContent = id.length;
 
-                    generatedId.classList.add('text-white');
-                    setTimeout(() => generatedId.classList.remove('text-white'), 300);
-                } catch (error) {
-                    generatedId.textContent = `Error: ${error.message}`;
-                    idLength.textContent = '-';
-                    idTimestamp.textContent = '-';
-                    idRandom.textContent = '-';
-                    idBinary.textContent = '-';
-                }
-            });
+            const decoded = generator.decode(id);
 
-            // Copy to clipboard
-            copyBtn.addEventListener('click', function() {
-                const text = generatedId.textContent;
-                if (text && !text.includes('Error')) {
-                    navigator.clipboard.writeText(text).then(() => {
-                        const originalText = copyBtn.innerHTML;
-                        copyBtn.innerHTML = `
+            if (decoded.formattedTimestamp) {
+              idTimestamp.textContent =
+                decoded.formattedTimestamp.toLocaleString("en-GB", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: false,
+                }) +
+                "." +
+                decoded.formattedTimestamp
+                  .getMilliseconds()
+                  .toString()
+                  .padStart(3, "0");
+              idTimestamp.title = decoded.formattedTimestamp.toISOString();
+            } else {
+              idTimestamp.textContent = "-";
+              idTimestamp.title = "-";
+            }
+
+            idRandom.textContent = decoded.random;
+            idRandom.title = decoded.random;
+
+            // Show binary representation (as string of bits)
+            if (decoded.binary) {
+              idBinary.textContent = decoded.binary;
+              idBinary.title = decoded.binary;
+            } else if (decoded.bits) {
+              idBinary.textContent = decoded.bits;
+              idBinary.title = decoded.bits;
+            } else {
+              idBinary.textContent = "-";
+              idBinary.title = "-";
+            }
+
+            generatedId.classList.add("text-white");
+            setTimeout(() => generatedId.classList.remove("text-white"), 300);
+          } catch (error) {
+            generatedId.textContent = `Error: ${error.message}`;
+            idLength.textContent = "-";
+            idTimestamp.textContent = "-";
+            idRandom.textContent = "-";
+            idBinary.textContent = "-";
+          }
+        });
+
+        // Copy to clipboard
+        copyBtn.addEventListener("click", function () {
+          const text = generatedId.textContent;
+          if (text && !text.includes("Error")) {
+            navigator.clipboard.writeText(text).then(() => {
+              const originalText = copyBtn.innerHTML;
+              copyBtn.innerHTML = `
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                             </svg>
                             Copied!
                         `;
-                        setTimeout(() => copyBtn.innerHTML = originalText, 2000);
-                    });
-                }
+              setTimeout(() => (copyBtn.innerHTML = originalText), 2000);
             });
-
-            generatedId.addEventListener('click', function() {
-                const text = generatedId.textContent;
-                if (text && !text.includes('Error')) {
-                    navigator.clipboard.writeText(text).then(() => {
-                        const flashMessage = document.createElement('div');
-                        flashMessage.textContent = 'Copied!';
-                        flashMessage.className = 'absolute top-2 right-2 bg-primary-500 text-white px-2 py-1 rounded text-xs';
-                        generatedId.parentElement.style.position = 'relative';
-                        generatedId.parentElement.appendChild(flashMessage);
-                        setTimeout(() => flashMessage.remove(), 1500);
-                    });
-                }
-            });
-
-            // Generate initial ID
-            generateBtn.click();
+          }
         });
+
+        generatedId.addEventListener("click", function () {
+          const text = generatedId.textContent;
+          if (text && !text.includes("Error")) {
+            navigator.clipboard.writeText(text).then(() => {
+              const flashMessage = document.createElement("div");
+              flashMessage.textContent = "Copied!";
+              flashMessage.className =
+                "absolute top-2 right-2 sm:top-4 sm:right-4 bg-primary-500 text-white px-2 py-1 rounded text-xs sm:text-sm";
+              generatedId.parentElement.style.position = "relative";
+              generatedId.parentElement.appendChild(flashMessage);
+              setTimeout(() => flashMessage.remove(), 1500);
+            });
+          }
+        });
+
+        // Generate initial ID
+        generateBtn.click();
+      });
     </script>
-</body>
+  </body>
 </html>
