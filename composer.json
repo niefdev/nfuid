@@ -2,7 +2,7 @@
   "name": "niefdev/nfuid",
   "description": "A compact PHP library for generating and decoding unique, URL-safe IDs using timestamps and random entropy.",
   "type": "library",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "license": "MIT",
   "authors": [
     {
