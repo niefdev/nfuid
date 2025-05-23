@@ -50,7 +50,7 @@ const idGen = new NFUID({
 
 **PHP**
 ```php
-$nfuid = new NFUID([
+$nfuid = new NFUID\NFUID([
     'baseAlphabet' => "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
     'timestampLength' => 43,
     'entropyLength' => 78
