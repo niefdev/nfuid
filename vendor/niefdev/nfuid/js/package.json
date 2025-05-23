@@ -1,0 +1,36 @@
+{
+  "name": "nfuid",
+  "version": "1.2.4",
+  "description": "A compact library for generating and decoding unique, URL-safe IDs using timestamps and random entropy",
+  "main": "src/nfuid.js",
+  "browser": "dist/nfuid.min.js",
+  "keywords": [
+    "id-generator",
+    "unique-id",
+    "timestamp",
+    "random",
+    "javascript",
+    "browser",
+    "node"
+  ],
+  "author": "niefdev <niefdev@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niefdev/nfuid.git"
+  },
+  "bugs": {
+    "url": "https://github.com/niefdev/nfuid/issues"
+  },
+  "homepage": "https://github.com/niefdev/nfuid#readme",
+  "files": [
+    "src/nfuid.js",
+    "dist/nfuid.min.js",
+    "examples/browser.html",
+    "LICENSE",
+    "README.md"
+  ],
+  "dependencies": {
+    "nfuid": "^1.2.0"
+  }
+}
