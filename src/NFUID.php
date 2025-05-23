@@ -1,5 +1,11 @@
 <?php
 
+namespace NFUID;
+
+use InvalidArgumentException;
+use DateTime;
+use DateTimeZone;
+
 class NFUID {
     private $BASE_ALPHABET;
     private $BASE_MAP;
