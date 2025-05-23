@@ -1,40 +1,46 @@
 # NFUID
 
-A compact JavaScript library for generating and decoding unique, URL-safe IDs using timestamps and random entropy. **NFUID v1.2.3** introduces improved header obfuscation, stricter validation, and more flexible bit configuration. It works in both browser and Node.js environments.
+A compact library for generating and decoding unique, URL-safe IDs using timestamps and random entropy. **NFUID v1.2** introduces improved header obfuscation, stricter validation, and more flexible bit configuration.
+
+**NFUID supports PHP, JavaScript, and Python** with identical logic, structure, and results across all languages.
 
 ## Features
 
 - Generates short, unique IDs with timestamp and random entropy
 - Customizable base alphabet (default: alphanumeric, no ambiguous characters)
-- Configurable timestamp and entropy lengths (now defaults: 43 bits timestamp, 78 bits entropy)
+- Configurable timestamp and entropy lengths (default: 43 bits timestamp, 78 bits entropy)
 - Decodes IDs to extract timestamp, entropy, and bit structure
-- Browser-compatible, no dependencies
+- No dependencies or external settings required in any language
 
 ## Installation
 
-### Via npm
+### Via npm (JavaScript/Node.js)
 
 ```bash
 npm install nfuid
 ```
 
-```javascript
-const NFUID = require('nfuid');
+### Via Composer (PHP)
+
+```bash
+composer require niefdev/nfuid
 ```
 
-### Manual Inclusion
+### Via pip (Python)
 
-Copy `src/nfuid.js` into your project or include `dist/nfuid.min.js` in your HTML:
-
-```html
-<script src="dist/nfuid.min.js"></script>
+```bash
+pip install nfuid
 ```
 
 ## Usage
 
+> **Usage is identical in PHP, JavaScript, and Python. Only syntax differs. No dependencies or extra setup required.**
+
 ### Initialize
 
+**JavaScript**
 ```javascript
+const NFUID = require('nfuid');
 const idGen = new NFUID({
     baseAlphabet: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
     timestampLength: 43, // bits for timestamp (0-63)
@@ -42,37 +48,66 @@ const idGen = new NFUID({
 });
 ```
 
+**PHP**
+```php
+$nfuid = new NFUID([
+    'baseAlphabet' => "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
+    'timestampLength' => 43,
+    'entropyLength' => 78
+]);
+```
+
+**Python**
+```python
+from nfuid import NFUID
+nfuid = NFUID(
+    base_alphabet="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
+    timestamp_length=43,
+    entropy_length=78
+)
+```
+
 ### Generate ID
 
-```javascript
-const id = idGen.generate();
-console.log("ID:", id);
+```js
+const id = idGen.generate(); // JS
+```
+```php
+$id = $nfuid->generate(); // PHP
+```
+```python
+id = nfuid.generate() # Python
 ```
 
 ### Decode ID
 
-```javascript
-const decoded = idGen.decode(id);
-console.log("Decoded:", decoded);
-// {
-//   timestampLength: 43,
-//   timestamp: 1736967023123,
-//   randomLength: 78,
-//   random: "e5f6a7b8...",
-//   formattedTimestamp: Date,
-//   binary: "..." // binary representation
-// }
+```js
+const decoded = idGen.decode(id); // JS
+```
+```php
+$decoded = $nfuid->decode($id); // PHP
+```
+```python
+decoded = nfuid.decode(id) # Python
 ```
 
-### Browser Example
-
-See `examples/browser.html` for a working demo.
+Decoded result:
+```json
+{
+  "timestampLength": 43,
+  "timestamp": 1736967023123,
+  "randomLength": 78,
+  "random": "e5f6a7b8...",
+  "formattedTimestamp": "2024-06-01 12:34:56.789",
+  "binary": "..." // binary representation
+}
+```
 
 ## Technical Details
 
 ### Architecture
 
-NFUID v1.2.3 IDs are structured as follows:
+NFUID v1.2 IDs are structured as follows:
 
 - **Static Flag**: 1 bit, always set to 1 (for easy parsing)
 - **Header**: 6 bits, obfuscated with random bits, encodes timestamp length
@@ -80,7 +115,7 @@ NFUID v1.2.3 IDs are structured as follows:
 - **Random Entropy**: Configurable bits (>= timestampLength + 6), provides uniqueness and obfuscation
 - **Base Encoding**: All bits are encoded using the custom alphabet
 
-The library uses BigInt for large numbers and crypto.getRandomValues for secure random bits.
+The library uses big integer math and cryptographically secure random generation in all supported languages.
 
 ### Bit Structure
 
@@ -92,21 +127,21 @@ Example: 1 + 6 + 43 + 78 = 128 bits → ~22 characters.
 
 ### Key Methods
 
-- `constructor({ baseAlphabet, timestampLength, entropyLength })`: Initializes with validated config.
+- `constructor` / `__construct` / `__init__`: Initializes with validated config.
 - `generate()`: Combines flag, header, timestamp, and entropy, then encodes to a string.
 - `decode(id)`: Extracts timestamp length, timestamp, random bits, and date from an ID.
-- Private methods: `#toBase`, `#fromBase` (base conversion), `#generateRandomBits` (random number generation).
+- Private methods: base conversion, random number generation.
 
 ### Security Notes
 
-- Uses crypto.getRandomValues for secure randomness.
+- Uses cryptographically secure random generation in all languages.
 - Not suitable for cryptographic secrets.
 
 ## Notes
 
-- **Compatibility**: Works in modern browsers (Chrome 74+, Firefox 90+, Safari 14.1+) and Node.js, using BigInt and crypto.getRandomValues.
+- **Compatibility**: Works in PHP, JavaScript (Node.js & browser), and Python (3.6+).
 - **Limitations**: Not for cryptographic use.
-- **Size**: Single class, no dependencies, minified version ~1KB.
+- **Size**: Single class, no dependencies, minimal footprint.
 
 ## Contributing
 
